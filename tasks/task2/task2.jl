@@ -1,8 +1,7 @@
 using HorizonSideRobots
 
 function sides_marking_n_return(r::Robot)
-    x = show_path_after_moving(r, West)
-    y = show_path_after_moving(r, Sud)
+    back_track = go_to_bottom_left_corner_return_path(r)
     for side in (Ost, Nord, West, Sud)
         while isborder(r, side) == false
             putmarker!(r)    
@@ -10,22 +9,30 @@ function sides_marking_n_return(r::Robot)
         end
         putmarker!(r)
     end
-    move_n(r, Ost, x)
-    move_n(r, Nord, y)
+    
+    back_by_path_o_sides(r, back_track)
 end
 
 
-function show_path_after_moving(r::Robot, side::HorizonSide)
-    n = 0
-    while isborder(r, side) == false
-        move!(r, side)
-        n = n + 1
+function go_to_bottom_left_corner_return_path(r::Robot)::Array
+    path = []
+    while (isborder(r, Sud) == false) || (isborder(r, West) == false)
+        if isborder(r, Sud) == false
+            move!(r, Sud)
+            push!(path, Nord)
+        end
+        if isborder(r, West) == false
+            move!(r, West)
+            push!(path, Ost)
+        end
     end
-    return n
+    return path
 end
 
-function move_n(r::Robot, side::HorizonSide, n::Int)
-    for i in 1:n
-        move!(r, side)
+function back_by_path_o_sides(r, path::Array)
+    n = length(path)
+    while n > 0
+        move!(r, path[n])
+        n = n - 1
     end
 end

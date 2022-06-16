@@ -1,30 +1,21 @@
 using HorizonSideRobots
 
 function all_field_marking(r::Robot)
-    y=show_path_after_moving(r, Sud)
-    x=show_path_after_moving(r, West)
+    back_track = go_to_bottom_left_corner_return_path(r)
 
-    while isborder(r, Ost) == false
-        move!(r, Ost)
-    end
-    while isborder(r, Nord) == false
-        move!(r, Nord)
-    end
-
-    mark_field_right_to_left(r, Sud)
+    mark_field_left_to_right(r, Nord)
 
     if isborder(r, Sud)
         markside(r, Nord)
     end
     markside(r, Sud)
 
-    move_n(r, Nord, y)
-    move_n(r, Ost, x)
+    go_to_bottom_left_corner_return_path(r)
+    back_by_path_o_sides(r, back_track)
 end
 
-function mark_field_right_to_left(r::Robot, side::HorizonSide)
-    while isborder(r, West) == false
-
+function mark_field_left_to_right(r::Robot, side::HorizonSide)
+    while isborder(r, Ost) == false
         while isborder(r, side) == false
             putmarker!(r)    
             move!(r, side)
@@ -32,30 +23,29 @@ function mark_field_right_to_left(r::Robot, side::HorizonSide)
         putmarker!(r)
 
         side = HorizonSide(mod(Int(side) + 2, 4))
-        move!(r, West)
+        move!(r, Ost)
     end
 end
 
-
-function show_path_after_moving(r::Robot, side::HorizonSide)
-    n = 0
-    while isborder(r, side)==false
-        move!(r, side)
-        n = n + 1
-    end 
-    return n
-end
-
-function markside(r, side::HorizonSide)
-    while isborder(r, side) == false
-        putmarker!(r)    
-        move!(r, side)
+function go_to_bottom_left_corner_return_path(r::Robot)::Array
+    path = []
+    while (isborder(r, Sud) == false) || (isborder(r, West) == false)
+        if isborder(r, Sud) == false
+            move!(r, Sud)
+            push!(path, Nord)
+        end
+        if isborder(r, West) == false
+            move!(r, West)
+            push!(path, Ost)
+        end
     end
-    putmarker!(r)
+    return path
 end
 
-function move_n(r::Robot, side::HorizonSide, n::Int)
-    for i in 1:n
-        move!(r, side)
+function back_by_path_o_sides(r, path::Array)
+    n = length(path)
+    while n > 0
+        move!(r, path[n])
+        n = n - 1
     end
 end

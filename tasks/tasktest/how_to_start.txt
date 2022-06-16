@@ -1,5 +1,0 @@
-In Terminal:
-julia
-using HorizonSideRobots
-include("*.jl")
-main("*.sit")
