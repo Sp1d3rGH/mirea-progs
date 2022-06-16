@@ -2,13 +2,21 @@ using HorizonSideRobots
 
 function obstacle_cross_marking(r::Robot)
     for side in (Nord, West, Sud, Ost)
+<<<<<<< HEAD
         num_steps = direction_marking_return_steps_count(r,side)
         несколько_шагов_через_препятствия(r,инвертировать_направление(side), num_steps)
+=======
+        n = direction_marking_return_steps_count(r, side) # Записывает пройденный путь, маркируя при этом клетки
+        for i in 1:n # Вернуться по n шагов через препятствия
+            move_through_obstacle(r, HorizonSide(mod(Int(side) + 2, 4)))
+        end
+>>>>>>> 989ebe7250709017f27742ae7c540a1e350aa969
     end
     putmarker!(r)
 end
 
 
+<<<<<<< HEAD
 function direction_marking_return_steps_count(r::Robot,side::HorizonSide)
     num_steps=0 
     while пройти_в_направлении_если_возможно(r, side) == true
@@ -38,10 +46,34 @@ function пройти_в_направлении_если_возможно(r::Rob
             if isborder(r, orthogonal_side) == false
                 move!(r, orthogonal_side)
                 num_steps += 1
+=======
+function direction_marking_return_steps_count(r::Robot, side::HorizonSide)
+    n = 0 
+    while move_through_obstacle(r, side) == true
+        putmarker!(r)
+        n += 1
+    end 
+    return n
+end
+
+function move_through_obstacle(r::Robot, forward_side::HorizonSide)::Bool
+    side_side = HorizonSide(mod(Int(forward_side) - 1, 4)) # Направление в сторону обхода
+    otherside_side = HorizonSide(mod(Int(side_side) + 2, 4)) # Обратное направление в сторону
+    n = 0
+    if isborder(r,forward_side)==false
+        move!(r,forward_side)
+        not_hit_border=true
+    else
+        while isborder(r,forward_side) == true
+            if isborder(r, side_side) == false
+                move!(r, side_side)
+                n += 1
+>>>>>>> 989ebe7250709017f27742ae7c540a1e350aa969
             else
                 break
             end
         end
+<<<<<<< HEAD
         if isborder(r,direct_side) == false
             move!(r,direct_side)
             while isborder(r,reverse_side) == true
@@ -181,3 +213,21 @@ function try_bypass_obstacle(r::Robot, side::HorizonSide)
         return obstacle_is_rectangle
     end
 end"""
+=======
+        if isborder(r,forward_side) == false
+            move!(r,forward_side)
+            while isborder(r, otherside_side) == true
+                move!(r,forward_side)
+            end
+            not_hit_border = true
+        else
+            not_hit_border = false
+        end
+        while n > 0
+            n -= 1
+            move!(r, otherside_side)
+        end
+    end
+    return not_hit_border
+end
+>>>>>>> 989ebe7250709017f27742ae7c540a1e350aa969

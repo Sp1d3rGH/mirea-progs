@@ -80,3 +80,37 @@ function back_by_path(r::Robot, path::Array)
         move_n(r, side, path[k - i + 1])
     end
 end
+
+# Пройти вперёд, учитывая и проходя через перегородки
+function move_through_obstacle(r::Robot, forward_side::HorizonSide)::Bool
+    side_side = HorizonSide(mod(Int(forward_side) - 1, 4)) # Направление в сторону обхода
+    otherside_side = HorizonSide(mod(Int(side_side) + 2, 4)) # Обратное направление в сторону
+    n = 0
+    if isborder(r,forward_side)==false
+        move!(r,forward_side)
+        not_hit_border=true
+    else
+        while isborder(r,forward_side) == true
+            if isborder(r, side_side) == false
+                move!(r, side_side)
+                n += 1
+            else
+                break
+            end
+        end
+        if isborder(r,forward_side) == false
+            move!(r,forward_side)
+            while isborder(r, otherside_side) == true
+                move!(r,forward_side)
+            end
+            not_hit_border = true
+        else
+            not_hit_border = false
+        end
+        while n > 0
+            n -= 1
+            move!(r, otherside_side)
+        end
+    end
+    return not_hit_border
+end

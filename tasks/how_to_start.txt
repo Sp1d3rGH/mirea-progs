@@ -1,6 +1,0 @@
-In Terminal:
-julia
-using HorizonSideRobots
-r=Robot("*.sit", animate=true)
-include("*.jl")
-main("*.sit")
